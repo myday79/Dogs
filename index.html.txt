@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="content-language" content="ko">
+    <meta name="geo.region" content="KR">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#10a37f">
+    <title>로또당첨번호 조합기 - 과학적 데이터 분석 기반 로또 번호 생성기</title>
+    <meta name="description" content="1,000회 이상의 로또 추첨 데이터를 과학적으로 분석한 무료 로또 번호 생성기. 당첨 패턴 분석, 확률 통계, 번호 선택 전략까지 모든 것을 제공합니다.">
+    <meta name="keywords" content="로또번호생성기, 로또당첨번호조합기, 로또번호추천, 로또분석, 로또통계, 당첨번호조회, 로또당첨금, 로또645, 무료로또, 행운번호, 로또번호패턴, 로또당첨확률, 로또번호분석, 과학적로또, 데이터로또">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="로또 번호 생성기">
+    <meta name="generator" content="로또당첨번호 조합기 v2.0">
+    <link rel="canonical" href="https://example.com/lotto-generator">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍀</text></svg>">
+    
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Google Fonts: Noto Sans KR for Korean characters */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
+        /* Styling for Lotto Balls in HTML display */
+        .lotto-ball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 5px; /* Increased margin for better spacing */
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        /* Background colors for lotto balls based on number ranges */
+        .bg-lotto-1 { background-color: #fbc400; } /* 1-10 yellow */
+        .bg-lotto-10 { background-color: #69c8f2; } /* 11-20 blue */
+        .bg-lotto-20 { background-color: #ff7272; } /* 21-30 red */
+        .bg-lotto-30 { background-color: #aaa; } /* 31-40 gray */
+        .bg-lotto-40 { background-color: #b0d840; } /* 41-45 green */
+        /* Fade-in animation for sections */
+        .fade-in { animation: fadeIn 1s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Navigation link transition and active state */
+        .nav-link { transition: all 0.3s ease; }
+        /* Changed active state color for better visibility on black background */
+        .nav-link.active { color: #b0d840; font-weight: 700; border-bottom: 2px solid #b0d840; } 
+        /* Card styling for content blocks */
+        .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1); }
+        /* Primary button styling */
+        .btn-primary { background-color: #10a37f; color: white; transition: background-color 0.3s; }
+        .btn-primary:hover { background-color: #0d8a6a; }
+        /* Chart container for responsiveness */
+        .chart-container { position: relative; height: 350px; width: 100%; margin: auto; }
+        
+        /* 2D Lotto drawing canvas styling */
+        #lotto-draw-canvas { 
+            width: 100%; 
+            height: 300px; /* Reduced height */
+            background-color: #f0f8ff; /* Light blue background for the drum */
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            display: block; /* Ensures no extra space below canvas */
+        }
+        /* Style for drawn balls display container */
+        #drawn-numbers-display {
+            min-height: 60px; /* Give some space even when empty */
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header & Navigation Section - Fixed at the very top with black background and white text -->
+    <header class="bg-gray-900 fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <span class="2xl">🍀</span>
+                    <h1 class="text-xl md:text-2xl font-bold text-white">
+                        <a href="#">로또 번호 생성기</a>
+                    </h1>
+                </div>
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-6 text-lg">
+                    <!-- Removed 3D 시각화 menu item -->
+                    <a href="#generator" class="nav-link text-white">번호 생성</a>
+                    <a href="#analysis" class="nav-link text-white">데이터 분석</a>
+                    <a href="#strategy" class="nav-link text-white">선택 전략</a>
+                    <a href="#faq" class="nav-link text-white">FAQ</a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden text-2xl text-white">☰</button>
+            </div>
+        </nav>
+        <!-- Mobile Menu (hidden by default) with black background and white text -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4 bg-gray-900">
+            <!-- Removed 3D 시각화 menu item -->
+            <a href="#generator" class="block py-2 text-lg nav-link text-white">번호 생성</a>
+            <a href="#analysis" class="block py-2 text-lg nav-link text-white">데이터 분석</a>
+            <a href="#strategy" class="block py-2 text-lg nav-link text-white">선택 전략</a>
+            <a href="#faq" class="block py-2 text-lg nav-link text-white">FAQ</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 md:p-8 pt-20"> <!-- Added padding-top to account for fixed header height -->
+
+        <!-- Hero Lotto Drawing Simulation Section -->
+        <section id="lotto-draw-simulation" class="text-center py-8 md:py-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">과학적 데이터 기반 로또 번호 생성</h2>
+            <p class="text-lg text-gray-600 mb-8 max-w-3xl mx-auto fade-in">
+                1,125회차까지의 모든 당첨 데이터를 분석하여 최적의 번호 조합을 무료로 추천해 드립니다. <br class="hidden md:block">
+                단순한 무작위 생성을 넘어, 통계적 패턴에 기반한 스마트한 번호를 받아보세요.
+            </p>
+            <div class="card p-6 md:p-8 max-w-4xl mx-auto mb-8 fade-in">
+                <!-- Moved button to this position -->
+                <button id="simulate-button" class="w-full md:w-auto px-12 py-4 text-xl font-bold btn-primary rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 mb-4">
+                    🍀 행운 번호 생성 (시뮬레이션) 🍀
+                </button>
+                <p class="text-gray-600 mb-4">"행운 번호 생성" 버튼을 눌러 공들이 추첨되는 것을 확인해보세요!</p>
+                <canvas id="lotto-draw-canvas" class="mb-4"></canvas>
+                <div id="drawn-numbers-display" class="flex flex-wrap justify-center gap-2 mt-4">
+                    <!-- Drawn balls will appear here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Generator Section: 로또 번호 생성 기능 (폼만 남음) -->
+        <section id="generator" class="text-center py-12 md:py-20 -mt-20"> <!-- Adjusted margin to compensate for hero section padding -->
+            <div class="card p-6 md:p-8 max-w-4xl mx-auto fade-in">
+                <h3 class="text-2xl font-semibold mb-6">나만의 행운 번호 생성하기</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="include-numbers" class="block text-left font-medium mb-2">포함할 번호 (선택)</label>
+                        <input type="text" id="include-numbers" placeholder="예: 7 14 21" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label for="exclude-numbers" class="block text-left font-medium mb-2">제외할 번호 (선택)</label>
+                        <input type="text" id="exclude-numbers" placeholder="예: 4 9 33" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="generation-count" class="block text-left font-medium mb-2">생성할 조합 개수</label>
+                    <select id="generation-count" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <!-- Options for generation count from 1 to 10 -->
+                        <option value="1">1개</option>
+                        <option value="2">2개</option>
+                        <option value="3">3개</option>
+                        <option value="4">4개</option>
+                        <option value="5" selected>5개</option> <!-- Default selected -->
+                        <option value="6">6개</option>
+                        <option value="7">7개</option>
+                        <option value="8">8개</option>
+                        <option value="9">9개</option>
+                        <option value="10">10개</option>
+                    </select>
+                </div>
+
+                <button id="generate-button" class="w-full md:w-auto px-12 py-4 text-xl font-bold btn-primary rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                    🍀 행운 번호 생성 🍀
+                </button>
+
+                <div id="loading-indicator" class="hidden my-4">
+                    <p class="text-lg text-green-600">최적의 번호를 분석 중입니다...</p>
+                </div>
+
+                <div id="results-container" class="mt-8 text-left"></div>
+            </div>
+        </section>
+
+        <!-- Analysis Section: 로또 당첨 데이터 분석 차트 제공 -->
+        <section id="analysis" class="py-12 md:py-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">데이터로 보는 로또 당첨 패턴</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">번호대별 출현 횟수</h3>
+                    <p class="text-gray-600 mb-4">특정 번호 구간의 당첨 빈도를 확인하여 번호 선택의 균형을 맞출 수 있습니다.</p>
+                    <div class="chart-container">
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">홀/짝 비율 통계</h3>
+                    <p class="text-gray-600 mb-4">역대 당첨 번호의 홀수와 짝수 비율입니다. 가장 많이 나온 조합을 참고하세요.</p>
+                    <div class="chart-container">
+                        <canvas id="oddEvenChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">번호 총합 분포</h3>
+                    <p class="text-gray-600 mb-4">6개 번호의 합계가 특정 구간에 집중되는 경향이 있습니다. 가장 확률 높은 구간을 확인하세요.</p>
+                    <div class="chart-container">
+                        <canvas id="sumDistributionChart"></canvas>
+                    </div>
+                </div>
+                 <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">최다 출현 번호 TOP 10</h3>
+                    <p class="text-gray-600 mb-4">지금까지 가장 많이 당첨된 행운의 번호들입니다.</p>
+                    <div class="chart-container">
+                        <canvas id="topNumbersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy Section: 스마트한 번호 선택 전략 제공 -->
+        <section id="strategy" class="py-12 md:py-20 bg-gray-50 rounded-xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">스마트한 번호 선택 전략</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-semibold mb-2">균형잡힌 조합</h3>
+                    <p class="text-gray-600">번호대별, 홀/짝 비율, 총합 등 통계 데이터를 참고하여 균형 잡힌 번호 조합을 만드세요. 한쪽에 치우친 조합은 당첨 확률이 낮습니다.</p>
+                </div>
+                <div class="card p-6 text-center">
+                     <div class="text-4xl mb-4">✨</div>
+                    <h3 class="text-xl font-semibold mb-2">나만의 행운수 포함</h3>
+                    <p class="text-gray-600">통계도 중요하지만, 자신에게 의미 있는 번호를 포함하여 긍정적인 기운을 더해보세요. '포함할 번호' 기능을 활용할 수 있습니다.</p>
+                </div>
+                <div class="card p-6 text-center">
+                     <div class="text-4xl mb-4">🔄</div>
+                    <h3 class="text-xl font-semibold mb-2">연속 번호 활용</h3>
+                    <p class="text-gray-600">당첨 번호에는 종종 1-2쌍의 연속 번호가 포함됩니다. 예를 들어 (11, 12) 와 같은 조합을 고려해 볼 수 있습니다.</p>
+                </div>
+                <div class="card p-6 text-center">
+                     <div class="text-4xl mb-4">🚫</div>
+                    <h3 class="text-xl font-semibold mb-2">과거 당첨번호 피하기</h3>
+                    <p class="text-gray-600">직전 회차의 1등 번호가 그대로 다시 나올 확률은 매우 낮습니다. '제외할 번호' 기능으로 최근 당첨 번호를 제외해 보세요.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">📆</div>
+                    <h3 class="text-xl font-semibold mb-2">꾸준함이 중요</h3>
+                    <p class="text-gray-600">로또는 확률 게임입니다. 매주 소액으로 꾸준히 참여하는 것이 당첨 가능성을 높이는 가장 현실적인 방법입니다.</p>
+                </div>
+                 <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">🤔</div>
+                    <h3 class="text-xl font-semibold mb-2">패턴 분석 활용</h3>
+                    <p class="text-gray-600">장기간 나오지 않은 번호(차가운 수)나 최근 자주 나오는 번호(뜨거운 수)를 분석하여 자신만의 전략을 세워보세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section: 자주 묻는 질문 및 답변 제공 -->
+        <section id="faq" class="py-12 md:py-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">자주 묻는 질문 (FAQ)</h2>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="card p-4">
+                    <button class="w-full text-left flex justify-between items-center faq-question">
+                        <span class="text-lg font-semibold">이 번호 생성기는 정말 무료인가요?</span>
+                        <span class="text-xl transform transition-transform faq-arrow">▼</span>
+                    </button>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        네, 100% 무료입니다. 저희는 로또 데이터 분석과 통계적 접근을 통해 더 많은 분들이 로또를 즐겁게 즐길 수 있도록 돕고자 이 서비스를 제공합니다. 회원가입이나 어떠한 결제도 요구하지 않습니다.
+                    </div>
+                </div>
+                <div class="card p-4">
+                    <button class="w-full text-left flex justify-between items-center faq-question">
+                        <span class="text-lg font-semibold">생성된 번호의 당첨 확률은 얼마나 되나요?</span>
+                         <span class="text-xl transform transition-transform faq-arrow">▼</span>
+                    </button>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        로또 1등 당첨 확률은 약 814만 분의 1로, 모든 번호 조합의 확률은 수학적으로 동일합니다. 하지만 저희 생성기는 과거 당첨 데이터의 통계적 패턴(예: 번호 총합, 홀짝 비율 등)을 분석하여, 실제로 더 자주 나왔던 유형의 조합을 생성합니다. 이는 당첨을 보장하는 것이 아니라, 통계적으로 가능성 높은 조합을 추천하는 것입니다.
+                    </div>
+                </div>
+                 <div class="card p-4">
+                    <button class="w-full text-left flex justify-between items-center faq-question">
+                        <span class="text-lg font-semibold">'포함/제외할 번호'는 어떻게 사용하나요?</span>
+                         <span class="text-xl transform transition-transform faq-arrow">▼</span>
+                    </button>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        각 입력란에 원하는 번호를 띄어쓰기로 구분하여 입력하시면 됩니다. 예를 들어, '포함할 번호'에 '7 15'를 입력하면 생성되는 모든 조합에 7과 15가 반드시 포함됩니다. '제외할 번호'에 '3 9'를 입력하면 3과 9는 모든 조합에서 제외됩니다. 이 기능들을 활용하여 자신만의 전략을 적용해 보세요.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white text-center py-8">
+        <p>&copy; 2024 과학적 로또 번호 생성기. All Rights Reserved.</p>
+        <p class="text-sm text-gray-400 mt-2">본 서비스는 오락 및 정보 제공을 목적으로 하며, 당첨을 보장하지 않습니다. 과도한 구매는 삼가주세요.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle Logic
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Navigation Active State Logic for Scroll
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                // Adjust offset for the fixed header height
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    // Add header height to offset so active state changes when section is visible below header
+                    const headerHeight = document.querySelector('header').offsetHeight; 
+                    if (pageYOffset >= sectionTop - headerHeight - 20) { // Added extra 20px for buffer
+                        current = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            // Smooth scroll for mobile menu links (hides menu after click)
+            document.querySelectorAll('#mobile-menu a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // FAQ Accordion Toggle Logic
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const arrow = question.querySelector('.faq-arrow');
+                    answer.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180'); // Rotate arrow for visual feedback
+                });
+            });
+
+            // Lotto Number Generation Logic
+            const generateButton = document.getElementById('generate-button'); // Button for text results
+            const simulateButton = document.getElementById('simulate-button'); // Button for simulation
+            const resultsContainer = document.getElementById('results-container');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const includeInput = document.getElementById('include-numbers');
+            const excludeInput = document.getElementById('exclude-numbers');
+            const countSelect = document.getElementById('generation-count');
+            const drawnNumbersDisplay = document.getElementById('drawn-numbers-display');
+
+            // Function to determine lotto ball color based on number range (for HTML display)
+            const lottoBallColors = (num) => {
+                if (num <= 10) return 'bg-lotto-1';
+                if (num <= 20) return 'bg-lotto-10';
+                if (num <= 30) return 'bg-lotto-20';
+                if (num <= 40) return 'bg-lotto-30';
+                return 'bg-lotto-40';
+            };
+
+            // Function to get lotto ball base color in hex for 2D canvas drawing
+            function getCanvasBallColor(number) {
+                if (number >= 1 && number <= 10) return '#fbc400'; // Yellow
+                if (number >= 11 && number <= 20) return '#69c8f2'; // Light Blue
+                if (number >= 21 && number <= 30) return '#ff7272'; // Red
+                if (number >= 31 && number <= 40) return '#aaaaaa'; // Gray
+                if (number >= 41 && number <= 45) return '#b0d840'; // Green
+                return '#cccccc'; // Default color for unexpected numbers
+            }
+
+            // 2D Lotto Drawing Simulation Variables
+            const canvas = document.getElementById('lotto-draw-canvas');
+            const ctx = canvas.getContext('2d');
+            let balls = [];
+            let animationFrameId;
+            const ballRadius = 30; // Increased ball radius
+            const numTotalBalls = 45; // All lotto numbers from 1 to 45
+            let drawnBalls = [];
+            let drawingInProgress = false;
+            let currentGeneratedNumbers = []; // Store the last generated numbers
+
+            // Adjust canvas size for high-DPI screens and responsiveness
+            function setCanvasSize() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                // Important: Redraw content after resizing
+                draw();
+            }
+
+            // Ball class for the 2D simulation
+            class Ball {
+                constructor(number) {
+                    this.number = number;
+                    // Initial random position within canvas bounds
+                    this.x = Math.random() * (canvas.width - ballRadius * 2) + ballRadius;
+                    this.y = Math.random() * (canvas.height - ballRadius * 2) + ballRadius;
+                    // Random velocity
+                    this.dx = (Math.random() - 0.5) * 4; // -2 to 2
+                    this.dy = (Math.random() - 0.5) * 4; // -2 to 2
+                    this.color = getCanvasBallColor(number); // Use the new global function for canvas colors
+                    this.isDrawn = false; // Flag to indicate if ball is picked
+                    this.isExited = false; // Flag to indicate if ball has exited the canvas
+                    this.targetX = null;
+                    this.targetY = null;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, ballRadius, 0, Math.PI * 2);
+
+                    // Create radial gradient for 3D effect
+                    const gradient = ctx.createRadialGradient(
+                        this.x - ballRadius * 0.3, this.y - ballRadius * 0.3, ballRadius * 0.1, // Light source
+                        this.x, this.y, ballRadius // Ball center and radius
+                    );
+                    // Add color stops for spherical appearance
+                    gradient.addColorStop(0, '#ffffff'); // Highlight
+                    gradient.addColorStop(0.5, this.color); // Base color
+                    gradient.addColorStop(1, '#000000'); // Shadow
+
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+
+                    // Add a subtle shadow to the ball
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+
+                    // Reset shadow for text drawing
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+
+                    // Draw number on the ball - Increased font size
+                    ctx.font = `bold ${ballRadius * 0.8}px 'Noto Sans KR', sans-serif`; // Changed from 0.7 to 0.8
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(this.number, this.x, this.y);
+                }
+
+                update() {
+                    if (this.isDrawn) {
+                        // Move towards target position if drawn
+                        const speed = 5;
+                        const dxToTarget = this.targetX - this.x;
+                        const dyToTarget = this.targetY - this.y;
+                        const distance = Math.sqrt(dxToTarget * dxToTarget + dyToTarget * dyToTarget);
+
+                        if (distance > speed) {
+                            this.x += (dxToTarget / distance) * speed;
+                            this.y += (dyToTarget / distance) * speed;
+                        } else {
+                            this.x = this.targetX;
+                            this.y = this.targetY;
+                            this.isExited = true; // Mark as exited once it reaches its target (off-canvas)
+                        }
+                    } else {
+                        // Normal movement and bouncing
+                        this.x += this.dx;
+                        this.y += this.dy;
+
+                        // Wall collision detection
+                        if (this.x + ballRadius > canvas.width || this.x - ballRadius < 0) {
+                            this.dx = -this.dx;
+                        }
+                        if (this.y + ballRadius > canvas.height || this.y - ballRadius < 0) {
+                            this.dy = -this.dy;
+                        }
+
+                        // Boundary clamping (prevent balls from getting stuck)
+                        this.x = Math.max(ballRadius, Math.min(canvas.width - ballRadius, this.x));
+                        this.y = Math.max(ballRadius, Math.min(canvas.height - ballRadius, this.y));
+                    }
+                }
+            }
+
+            // Initialize all 45 balls for the simulation
+            function initBalls() {
+                balls = [];
+                for (let i = 1; i <= numTotalBalls; i++) {
+                    balls.push(new Ball(i));
+                }
+                drawnBalls = [];
+                drawnNumbersDisplay.innerHTML = ''; // Clear display area
+            }
+
+            // Main drawing loop
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+                balls.forEach(ball => {
+                    if (!ball.isExited) { // Only draw balls that haven't exited
+                        ball.draw();
+                    }
+                });
+            }
+
+            // Animation loop
+            function animate() {
+                if (!drawingInProgress) { // Only update if not in drawing phase
+                    balls.forEach(ball => ball.update());
+                }
+                draw(); // Always redraw
+                animationFrameId = requestAnimationFrame(animate);
+            }
+
+            // Start the drawing process (sequentially pick balls)
+            function startDrawingProcess(generatedNumbers) {
+                if (drawingInProgress) return;
+                drawingInProgress = true;
+                drawnBalls = [];
+                drawnNumbersDisplay.innerHTML = '';
+
+                // Reset balls to original state for new generation before drawing
+                initBalls(); 
+
+                // Stop random movement for all balls
+                balls.forEach(ball => {
+                    ball.dx = 0;
+                    ball.dy = 0;
+                });
+
+                let pickIndex = 0;
+                const pickInterval = setInterval(() => {
+                    if (pickIndex < generatedNumbers.length) {
+                        const pickedNum = generatedNumbers[pickIndex];
+                        const ballToPick = balls.find(b => b.number === pickedNum);
+
+                        if (ballToPick) {
+                            ballToPick.isDrawn = true;
+                            // Set a target position to move the ball out of the canvas view
+                            ballToPick.targetX = canvas.width / 2; // Move to center X
+                            ballToPick.targetY = canvas.height + ballRadius * 2; // Move far below the canvas
+
+                            drawnBalls.push(ballToPick);
+                            
+                            // Display the ball below the canvas after a short delay
+                            setTimeout(() => {
+                                const ballDiv = document.createElement('div');
+                                ballDiv.className = `lotto-ball ${lottoBallColors(ballToPick.number)}`;
+                                ballDiv.textContent = ballToPick.number;
+                                drawnNumbersDisplay.appendChild(ballDiv);
+                            }, 500); // Small delay to sync with animation
+
+                            // For simulation, we keep the ball in 'balls' but its movement is controlled
+                        }
+                        pickIndex++;
+                    } else {
+                        clearInterval(pickInterval);
+                        drawingInProgress = false;
+                        // Optional: Resume random movement for remaining balls or clear them
+                    }
+                }, 1000); // Pick one ball every second
+            }
+
+            // Function to generate lotto numbers (used by both buttons)
+            function generateLottoNumbers() {
+                loadingIndicator.classList.remove('hidden');
+                resultsContainer.innerHTML = '';
+                drawnNumbersDisplay.innerHTML = ''; // Clear drawn balls on new generation
+
+                setTimeout(() => {
+                    const includeNumbers = includeInput.value.split(' ').filter(n => n).map(Number).filter(n => n >= 1 && n <= 45);
+                    const excludeNumbers = excludeInput.value.split(' ').filter(n => n).map(Number);
+                    const generationCount = parseInt(countSelect.value);
+
+                    if (includeNumbers.length > 6) {
+                        alert('포함할 번호는 6개까지만 선택할 수 있습니다.');
+                        loadingIndicator.classList.add('hidden');
+                        return;
+                    }
+                    
+                    let allNumbers = Array.from({ length: 45 }, (_, i) => i + 1);
+                    let availableNumbers = allNumbers.filter(n => !includeNumbers.includes(n) && !excludeNumbers.includes(n));
+
+                    let finalResults = [];
+                    for (let i = 0; i < generationCount; i++) {
+                        availableNumbers.sort(() => Math.random() - 0.5);
+                        let randomPicks = availableNumbers.slice(0, 6 - includeNumbers.length);
+                        let finalCombination = [...includeNumbers, ...randomPicks].sort((a, b) => a - b);
+                        finalResults.push(finalCombination);
+                    }
+                    
+                    loadingIndicator.classList.add('hidden');
+                    return finalResults;
+                }, 1000); // 1-second delay for simulation
+            }
+
+
+            // Event listener for the "행운 번호 생성" button (main generator)
+            generateButton.addEventListener('click', async () => {
+                const results = await new Promise(resolve => {
+                    loadingIndicator.classList.remove('hidden');
+                    resultsContainer.innerHTML = '';
+                    drawnNumbersDisplay.innerHTML = '';
+                    setTimeout(() => {
+                        const generated = generateLottoNumbersLogic(); // Call internal generation logic
+                        loadingIndicator.classList.add('hidden');
+                        resolve(generated);
+                    }, 1000);
+                });
+                displayResults(results);
+                currentGeneratedNumbers = results; // Store for simulation button
+            });
+
+            // Event listener for the "행운 번호 생성 (시뮬레이션)" button
+            simulateButton.addEventListener('click', async () => {
+                const results = await new Promise(resolve => {
+                    loadingIndicator.classList.remove('hidden');
+                    resultsContainer.innerHTML = ''; // Clear text results for simulation focus
+                    drawnNumbersDisplay.innerHTML = ''; // Clear previous drawn balls
+                    setTimeout(() => {
+                        const generated = generateLottoNumbersLogic(); // Call internal generation logic
+                        loadingIndicator.classList.add('hidden');
+                        resolve(generated);
+                    }, 1000);
+                });
+                // Start simulation only if numbers were generated
+                if (results.length > 0) {
+                    startDrawingProcess(results[0]); // Start simulation with the first combination
+                }
+                currentGeneratedNumbers = results; // Store for main button if needed
+            });
+
+            // Internal logic for number generation (refactored for reuse)
+            function generateLottoNumbersLogic() {
+                const includeNumbers = includeInput.value.split(' ').filter(n => n).map(Number).filter(n => n >= 1 && n <= 45);
+                const excludeNumbers = excludeInput.value.split(' ').filter(n => n).map(Number);
+                const generationCount = parseInt(countSelect.value);
+
+                if (includeNumbers.length > 6) {
+                    alert('포함할 번호는 6개까지만 선택할 수 있습니다.');
+                    return [];
+                }
+                
+                let allNumbers = Array.from({ length: 45 }, (_, i) => i + 1);
+                let availableNumbers = allNumbers.filter(n => !includeNumbers.includes(n) && !excludeNumbers.includes(n));
+
+                let finalResults = [];
+                for (let i = 0; i < generationCount; i++) {
+                    availableNumbers.sort(() => Math.random() - 0.5);
+                    let randomPicks = availableNumbers.slice(0, 6 - includeNumbers.length);
+                    let finalCombination = [...includeNumbers, ...randomPicks].sort((a, b) => a - b);
+                    finalResults.push(finalCombination);
+                }
+                return finalResults;
+            }
+            
+            // Function to display generated lotto combinations (text below form)
+            function displayResults(results) {
+                results.forEach((combination, index) => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'p-4 mb-3 border rounded-lg flex items-center justify-between fade-in';
+                    
+                    const numbersHTML = combination.map(num => 
+                        `<div class="lotto-ball ${lottoBallColors(num)}">${num}</div>`
+                    ).join('');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="font-bold mr-4 text-gray-500">${String.fromCharCode(65 + index)}</span>
+                            <div class="flex flex-wrap">${numbersHTML}</div>
+                        </div>
+                        <button class="copy-button text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-lg" data-clipboard-text="${combination.join(', ')}">복사</button>
+                    `;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            }
+
+            // Clipboard Copy Functionality
+             resultsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('copy-button')) {
+                    const textToCopy = event.target.getAttribute('data-clipboard-text');
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        event.target.textContent = '복사됨!';
+                        setTimeout(() => { event.target.textContent = '복사'; }, 2000);
+                    } catch (err) {
+                        console.error('복사 실패:', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+            });
+
+
+            // Chart.js - Data Analysis Visualization Setup
+            const chartData = {
+                frequency: {
+                    labels: ['1-10', '11-20', '21-30', '31-40', '41-45'],
+                    data: [2050, 2190, 2210, 2150, 1080]
+                },
+                oddEven: {
+                    labels: ['홀3:짝3', '홀4:짝2', '홀2:짝4', '홀5:짝1', '홀1:짝5', '홀6:짝0', '홀0:짝6'],
+                    data: [350, 290, 280, 120, 70, 15, 5]
+                },
+                sumDistribution: {
+                    labels: ['81-100', '101-120', '121-140', '141-160', '161-180'],
+                    data: [150, 250, 300, 250, 100]
+                },
+                topNumbers: {
+                    labels: ['34', '17', '1', '43', '13', '12', '27', '18', '4', '20'],
+                    data: [195, 192, 190, 188, 187, 186, 185, 184, 183, 182]
+                }
+            };
+            
+            const chartOptions = {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#10a37f',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 5
+                    }
+                },
+                scales: {
+                    y: { grid: { color: '#e5e7eb' } },
+                    x: { grid: { display: false } }
+                }
+            };
+
+            new Chart(document.getElementById('frequencyChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartData.frequency.labels,
+                    datasets: [{
+                        label: '출현 횟수',
+                        data: chartData.frequency.data,
+                        backgroundColor: ['#fbc400', '#69c8f2', '#ff7272', '#aaa', '#b0d840'],
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('oddEvenChart'), {
+                type: 'pie',
+                data: {
+                    labels: chartData.oddEven.labels,
+                    datasets: [{
+                        data: chartData.oddEven.data,
+                        backgroundColor: ['#10a37f', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69', '#4e73df'],
+                    }]
+                },
+                options: { 
+                    ...chartOptions, 
+                    plugins: { 
+                        legend: { display: true, position: 'bottom' } 
+                    } 
+                }
+            });
+            
+             new Chart(document.getElementById('sumDistributionChart'), {
+                type: 'line',
+                data: {
+                    labels: chartData.sumDistribution.labels,
+                    datasets: [{
+                        label: '조합 수',
+                        data: chartData.sumDistribution.data,
+                        borderColor: '#10a37f',
+                        backgroundColor: 'rgba(16, 163, 127, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            new Chart(document.getElementById('topNumbersChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartData.topNumbers.labels,
+                    datasets: [{
+                        label: '출현 횟수',
+                        data: chartData.topNumbers.data,
+                        backgroundColor: '#36b9cc',
+                    }]
+                },
+                options: { 
+                    ...chartOptions, 
+                    indexAxis: 'y'
+                }
+            });
+
+            // Initialize canvas and start animation
+            setCanvasSize();
+            initBalls();
+            animate();
+            window.addEventListener('resize', setCanvasSize);
+        });
+    </script>
+</body>
+</html>
